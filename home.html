@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아쿠아 다이어리 - 홈</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fdfaf6;
+            --primary-color: #5587d9;
+            --text-color: #333;
+            --border-color: #d1cdb7;
+        }
+
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 스플래시 화면 */
+        #splash {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease-out;
+        }
+        #splash h1 { font-size: 2.5em; margin-bottom: 10px; }
+        #splash p { font-size: 1.2em; }
+
+        /* 네비게이션 탭 */
+        .nav-bar {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-btn {
+            flex: 1;
+            padding: 15px 0;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background-color: #f0f5ff; }
+        .nav-btn.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h2 { color: var(--primary-color); border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; }
+        
+        button.action-btn {
+            background-color: var(--primary-color); color: white;
+            border: none; padding: 12px 20px; border-radius: 8px;
+            font-size: 16px; cursor: pointer; width: 100%; margin-top: 15px;
+            font-family: inherit;
+        }
+        button.action-btn:hover { background-color: #3b6bba; }
+
+        /* 낚시 기록용 스타일 */
+        .fish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .fish-item { border: 1px solid #eee; padding: 10px; border-radius: 8px; background-color: #fafafa; }
+        .fish-item input { width: 50px; text-align: right; padding: 5px; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        .total-box { background: #f0f5ff; padding: 15px; text-align: center; font-size: 1.2em; font-weight: bold; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div id="splash">
+    <h1>🌊 아쿠아 & 테런 다이어리</h1>
+    <p>데이터를 불러오는 중입니다...</p>
+</div>
+
+<div class="nav-bar">
+    <a href="home.html" class="nav-btn active">🏠 낚시 기록</a>
+    <a href="history.html" class="nav-btn">📊 경험치 증감표</a>
+    <a href="level.html" class="nav-btn">⭐️ 레벨업 계산기</a>
+</div>
+
+<div class="container">
+    <h2>🐟 오늘의 낚시 기록</h2>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+        <input type="date" id="recordDate" style="padding: 8px; font-family: inherit; border: 1px solid var(--border-color); border-radius: 5px;">
+        <button onclick="clearInputs()" style="padding: 8px; border: none; background: #95a5a6; color: white; border-radius: 5px; cursor: pointer; font-family: inherit;">수량 초기화</button>
+    </div>
+    <div class="fish-grid" id="fishGrid">
+        </div>
+    <div class="total-box">
+        총 획득한 경험치: <span id="todayExp" style="color: #e74c3c;">0</span> EXP
+    </div>
+    <button class="action-btn" onclick="saveRecord()">다이어리에 기록 저장하기</button>
+</div>
+
+<script>
+    // 숫자 콤마 포맷팅
+    const fNum = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    // 물고기 데이터
+    const fishData = [
+        { name: "하트 연어", exp: 1500 }, { name: "핑크 해마", exp: 3000 }, { name: "블루 해파리", exp: 5000 },
+        { name: "옐로우탱 쉐프", exp: 8000 }, { name: "왕꽃아귀", exp: 10000 }, { name: "구름 청새치", exp: 20000 },
+        { name: "리본 복어", exp: 10000 }, { name: "파인애플 가자미", exp: 15000 }, { name: "워터메론돔", exp: 20000 },
+        { name: "하트 두동가리돔", exp: 40000 }, { name: "꿀벌 갈치", exp: 50000 }, { name: "엔젤 다랑어", exp: 100000 },
+        { name: "무지개빛 베타", exp: 100000 }, { name: "점박이 트리커 피쉬", exp: 10000 }, { name: "박치기왕 플라워 혼", exp: 20000 },
+        { name: "무리쉬 아이돌 스타", exp: 50000 }, { name: "애교쟁이 키싱구라미", exp: 40000 }, { name: "요리사 블루탱", exp: 15000 },
+        { name: "황금 구름 청새치", exp: 50000 }, { name: "황금 왕꽃아귀", exp: 30000 }, { name: "황금 옐로우탱 쉐프", exp: 20000 },
+        { name: "황금 블루 해파리", exp: 15000 }, { name: "황금 핑크 해마", exp: 6500 }, { name: "황금 하트 연어", exp: 3000 }
+    ];
+
+    // 앱 초기화 로직
+    window.onload = () => {
+        // 스플래시 화면 제어 (홈에서만 노출)
+        setTimeout(() => {
+            document.getElementById('splash').style.opacity = '0';
+            setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 800);
+        }, 1500);
+        
+        document.getElementById('recordDate').valueAsDate = new Date();
+        renderFishGrid();
+    };
+
+    function renderFishGrid() {
+        const grid = document.getElementById('fishGrid');
+        fishData.forEach((fish, i) => {
+            grid.innerHTML += `
+                <div class="fish-item">
+                    <div style="font-weight:bold;">${fish.name}</div>
+                    <div style="font-size:0.8em; color:#888; margin-bottom:5px;">기본: ${fNum(fish.exp)} EXP</div>
+                    <div><input type="number" min="0" id="fish_${i}" oninput="calcTodayExp()">마리</div>
+                </div>`;
+        });
+    }
+
+    function calcTodayExp() {
+        let total = 0;
+        fishData.forEach((fish, i) => {
+            const count = parseInt(document.getElementById(`fish_${i}`).value) || 0;
+            total += fish.exp * count;
+        });
+        document.getElementById('todayExp').innerText = fNum(total);
+        return total;
+    }
+
+    function clearInputs() {
+        fishData.forEach((_, i) => document.getElementById(`fish_${i}`).value = '');
+        calcTodayExp();
+    }
+
+    function saveRecord() {
+        const date = document.getElementById('recordDate').value;
+        const total = calcTodayExp();
+        if(total === 0) return alert("입력된 물고기가 없습니다!");
+
+        let history = JSON.parse(localStorage.getItem('fishDiary')) || {};
+        history[date] = total;
+        localStorage.setItem('fishDiary', JSON.stringify(history));
+        
+        alert(`${date} 기록이 저장되었습니다!\n획득 경험치: ${fNum(total)} EXP`);
+        clearInputs();
+    }
+</script>
+
+</body>
+</html>
