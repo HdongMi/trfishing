@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아쿠아 다이어리 - 증감표</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fdfaf6;
+            --primary-color: #5587d9;
+            --text-color: #333;
+            --border-color: #d1cdb7;
+        }
+
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 네비게이션 탭 */
+        .nav-bar {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-btn {
+            flex: 1;
+            padding: 15px 0;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background-color: #f0f5ff; }
+        .nav-btn.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { color: var(--primary-color); border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; }
+
+        /* 기록 테이블 스타일 */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background-color: #fff; }
+        th, td { border: 1px solid #eee; padding: 15px 10px; text-align: center; }
+        th { background-color: var(--primary-color); color: white; font-weight: normal; border: 1px solid var(--primary-color); }
+        tr:nth-child(even) { background-color: #fafafa; }
+        tr:hover { background-color: #f0f5ff; }
+        
+        .up { color: #e74c3c; font-weight: bold; }
+        .down { color: #3498db; font-weight: bold; }
+        .same { color: #95a5a6; }
+        
+        .delete-btn {
+            background-color: #ff7675; color: white; border: none; 
+            padding: 6px 12px; border-radius: 4px; cursor: pointer; 
+            font-family: inherit; font-size: 0.9em; transition: 0.2s;
+        }
+        .delete-btn:hover { background-color: #d63031; }
+        .empty-msg { text-align: center; padding: 30px; color: #888; }
+    </style>
+</head>
+<body>
+
+<div class="nav-bar">
+    <a href="home.html" class="nav-btn">🏠 낚시 기록</a>
+    <a href="history.html" class="nav-btn active">📊 경험치 증감표</a>
+    <a href="level.html" class="nav-btn">⭐️ 레벨업 계산기</a>
+</div>
+
+<div class="container">
+    <h2>📈 일별 경험치 증감표</h2>
+    <table id="historyTable">
+        <thead>
+            <tr>
+                <th>날짜</th>
+                <th>총 획득 경험치</th>
+                <th>전일 대비 증감</th>
+                <th>관리</th>
+            </tr>
+        </thead>
+        <tbody id="historyBody">
+            </tbody>
+    </table>
+</div>
+
+<script>
+    // 숫자 콤마 포맷팅
+    const fNum = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    window.onload = () => {
+        renderHistory();
+    };
+
+    function renderHistory() {
+        const tbody = document.getElementById('historyBody');
+        tbody.innerHTML = '';
+        
+        // 로컬 스토리지에서 기록 불러오기
+        const history = JSON.parse(localStorage.getItem('fishDiary')) || {};
+        const dates = Object.keys(history).sort(); // 날짜순 정렬
+
+        if(dates.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">아직 저장된 낚시 기록이 없습니다. 홈에서 기록을 추가해 보세요!</td></tr>';
+            return;
+        }
+
+        // 최신 날짜가 위로 오도록 역순 반복
+        for (let i = dates.length - 1; i >= 0; i--) {
+            const date = dates[i];
+            const exp = history[date];
+            let diffHtml = '<span class="same">-</span>';
+
+            // 전일 데이터가 존재하는지 확인 후 증감 계산
+            if (i > 0) {
+                const prevDate = dates[i-1];
+                const prevExp = history[prevDate];
+                const diff = exp - prevExp;
+
+                if (diff > 0) diffHtml = `<span class="up">▲ ${fNum(diff)}</span>`;
+                else if (diff < 0) diffHtml = `<span class="down">▼ ${fNum(Math.abs(diff))}</span>`;
+                else diffHtml = `<span class="same">- (동일함)</span>`;
+            } else if (dates.length > 1) {
+                diffHtml = `<span class="same">첫 기록</span>`;
+            }
+
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${date}</strong></td>
+                    <td>${fNum(exp)} EXP</td>
+                    <td>${diffHtml}</td>
+                    <td><button class="delete-btn" onclick="deleteRecord('${date}')">삭제</button></td>
+                </tr>
+            `;
+        }
+    }
+
+    // 기록 삭제 로직
+    function deleteRecord(date) {
+        if(confirm(`정말 ${date}의 기록을 삭제하시겠습니까?`)) {
+            let history = JSON.parse(localStorage.getItem('fishDiary')) || {};
+            delete history[date];
+            localStorage.setItem('fishDiary', JSON.stringify(history));
+            renderHistory(); // 테이블 새로고침
+        }
+    }
+</script>
+
+</body>
+</html>
