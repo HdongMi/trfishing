@@ -92,12 +92,12 @@
 <body>
 
 <div id="splash">
-    <h1>🌊 아쿠아 & 테런 다이어리</h1>
+    <h1>🌊 테런 낚시 다이어리</h1>
     <p>데이터를 불러오는 중입니다...</p>
 </div>
 
 <div class="nav-bar">
-    <a href="home.html" class="nav-btn active">🏠 낚시 기록</a>
+    <a href="index.html" class="nav-btn active">🏠 낚시 기록</a>
     <a href="history.html" class="nav-btn">📊 경험치 증감표</a>
     <a href="level.html" class="nav-btn">⭐️ 레벨업 계산기</a>
 </div>
@@ -134,11 +134,22 @@
 
     // 앱 초기화 로직
     window.onload = () => {
-        // 스플래시 화면 제어 (홈에서만 노출)
-        setTimeout(() => {
-            document.getElementById('splash').style.opacity = '0';
-            setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 800);
-        }, 1500);
+        const splash = document.getElementById('splash');
+        
+        // sessionStorage에 'splashShown' 기록이 없다면 (처음 접속 시)
+        if (!sessionStorage.getItem('splashShown')) {
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                setTimeout(() => { 
+                    splash.style.display = 'none'; 
+                    // 한 번 띄웠다는 표시 남기기
+                    sessionStorage.setItem('splashShown', 'true');
+                }, 800);
+            }, 1500);
+        } else {
+            // 기록이 있다면 (다른 페이지에서 넘어온 경우) 바로 숨기기
+            splash.style.display = 'none';
+        }
         
         document.getElementById('recordDate').valueAsDate = new Date();
         renderFishGrid();
