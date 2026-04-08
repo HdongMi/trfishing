@@ -9,7 +9,6 @@
         :root {
             --bg-color: #fdfaf6;
             --primary-color: #5587d9;
-            --secondary-color: #f0f5ff;
             --text-color: #333;
             --border-color: #d1cdb7;
         }
@@ -21,7 +20,7 @@
             margin: 0; padding: 0;
         }
 
-        /* 초기 상태를 display: none으로 설정 */
+        /* 스플래시 화면 */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--primary-color); color: white;
@@ -29,29 +28,61 @@
             z-index: 9999; transition: opacity 0.5s;
         }
 
+        /* 네비게이션 바 (History 페이지와 통일) */
         .nav-bar {
-            display: flex; background: white; position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         .nav-btn {
-            flex: 1; padding: 12px 0; text-align: center; text-decoration: none;
-            color: #888; font-size: 0.9em; font-weight: bold; border-bottom: 3px solid transparent;
+            flex: 1;
+            padding: 15px 0;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: bold;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
         }
-        .nav-btn.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
+        .nav-btn:hover { background-color: #f0f5ff; }
+        .nav-btn.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
 
-        .container { padding: 15px; max-width: 1000px; margin: 0 auto; }
+        /* 메인 컨테이너 */
+        .container {
+            max-width: 1000px; /* 6열 확보를 위해 가로폭 확장 */
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { color: var(--primary-color); border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; margin-top: 0; }
 
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         #recordDate { border: 1px solid var(--border-color); border-radius: 5px; padding: 5px; font-family: inherit; }
 
+        /* 물고기 그리드 (가로 6줄 유지) */
         .fish-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, 1fr); /* 모바일 3열 */
             gap: 10px;
         }
 
         @media (min-width: 768px) {
-            .fish-grid { grid-template-columns: repeat(6, 1fr); }
+            .fish-grid { grid-template-columns: repeat(6, 1fr); } /* 태블릿/PC 6열 유지 */
         }
 
         .fish-item {
@@ -76,16 +107,11 @@
         }
 
         .fish-input::-webkit-outer-spin-button,
-        .fish-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .fish-input[type=number] {
-            -moz-appearance: textfield;
-        }
+        .fish-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .fish-input[type=number] { -moz-appearance: textfield; }
 
         .total-box {
-            background: var(--secondary-color); padding: 15px; text-align: center;
+            background: #f0f5ff; padding: 15px; text-align: center;
             border-radius: 12px; margin: 20px 0; font-weight: bold;
         }
         #todayExp { color: #e74c3c; font-size: 1.2em; }
@@ -101,17 +127,18 @@
 <body>
 
 <div id="splash">
-    <h2 style="margin:0;">🌊 테일즈런너 낚시 다이어리</h2>
+    <h2 style="margin:0; border:none;">🌊 테일즈런너 낚시 다이어리</h2>
     <p style="font-size:0.8em; opacity:0.8;">producer.제이뜌</p>
 </div>
 
 <div class="nav-bar">
     <a href="index.html" class="nav-btn active">🏠 낚시 기록</a>
     <a href="history.html" class="nav-btn">📊 경험치 증감표</a>
-    <a href="level.html" class="nav-btn">⭐️ 계산기</a>
+    <a href="level.html" class="nav-btn">⭐️ 레벨업 계산기</a>
 </div>
 
 <div class="container">
+    <h2>🎣 어획물</h2>
     <div class="header-row">
         <input type="date" id="recordDate" onchange="loadDataByDate()">
         <button onclick="clearInputs()" style="background:none; border:none; color:#999; font-size:0.8em; text-decoration:underline; cursor:pointer;">전체 초기화</button>
@@ -146,20 +173,15 @@
 
     function handleSplash() {
         const splash = document.getElementById('splash');
-        // 세션에 'visited' 기록이 있는지 확인
         const hasVisited = sessionStorage.getItem('hasVisited');
-
         if (!hasVisited) {
-            // 처음 접속한 경우
             splash.style.display = 'flex';
             setTimeout(() => { 
                 splash.style.opacity = '0'; 
                 setTimeout(() => splash.style.display = 'none', 500); 
             }, 800);
-            // 방문 기록 저장
             sessionStorage.setItem('hasVisited', 'true');
         } else {
-            // 이미 방문한 경우 스플래시를 아예 보여주지 않음
             splash.style.display = 'none';
         }
     }
@@ -185,15 +207,8 @@
     function loadDataByDate() {
         const selectedDate = document.getElementById('recordDate').value;
         const allHistory = JSON.parse(localStorage.getItem('fishCountHistory')) || {};
-        
-        if (allHistory[selectedDate]) {
-            applyCounts(allHistory[selectedDate]);
-        } else {
-            const dates = Object.keys(allHistory).sort().reverse();
-            const prevDate = dates.find(d => d < selectedDate);
-            if (prevDate) applyCounts(allHistory[prevDate]);
-            else applyCounts({});
-        }
+        if (allHistory[selectedDate]) applyCounts(allHistory[selectedDate]);
+        else applyCounts({});
         calcTotal();
     }
 
@@ -223,7 +238,6 @@
     function saveRecord() {
         const date = document.getElementById('recordDate').value;
         const total = calcTotal();
-        
         let diary = JSON.parse(localStorage.getItem('fishDiary')) || {};
         diary[date] = total;
         localStorage.setItem('fishDiary', JSON.stringify(diary));
@@ -235,7 +249,6 @@
         });
         allHistory[date] = currentCounts;
         localStorage.setItem('fishCountHistory', JSON.stringify(allHistory));
-        
         alert(`${date} 기록이 저장되었습니다!`);
     }
 </script>
