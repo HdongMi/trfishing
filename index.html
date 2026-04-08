@@ -89,8 +89,22 @@
             background: white; border: 1px solid #eee; border-radius: 12px;
             padding: 12px 5px; text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            display: flex; /* 내부 세로 배치 */
+            flex-direction: column;
+            align-items: center;
         }
-        .fish-name { font-size: 0.85em; font-weight: bold; margin-bottom: 8px; color: #444; height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+
+        /* 물고기 이미지 스타일 정의 */
+        .fish-image {
+            width: 50px; /* 적당한 이미지 너비 */
+            height: 50px; /* 적당한 이미지 높이 */
+            object-fit: contain; /* 비율 유지 */
+            margin-bottom: 5px; /* 이미지 아래 여백 */
+            border-radius: 5px; /* 부드러운 모서리 (필요시) */
+            background-color: #f9f9f9; /* 이미지가 없을 때를 위한 배경색 */
+        }
+
+        .fish-name { font-size: 0.85em; font-weight: bold; margin-bottom: 8px; color: #444; height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; width: 100%; }
         .fish-exp { font-size: 0.7em; color: #aaa; margin-bottom: 8px; display: block; }
 
         .fish-input { 
@@ -138,7 +152,7 @@
 </div>
 
 <div class="container">
-    <h2>🎣 어획물</h2>
+    <h2>🎣 낚시 기록 입력</h2>
     <div class="header-row">
         <input type="date" id="recordDate" onchange="loadDataByDate()">
         <button onclick="clearInputs()" style="background:none; border:none; color:#999; font-size:0.8em; text-decoration:underline; cursor:pointer;">전체 초기화</button>
@@ -153,15 +167,33 @@
 </div>
 
 <script>
+    // 각 물고기 항목에 'imageFile' 속성을 추가했습니다.
+    // 사용자님께서 이미지 파일명을 이 속성에 맞게 수정하셔야 합니다.
     const fishData = [
-        { name: "하트 연어", exp: 1500 }, { name: "핑크 해마", exp: 3000 }, { name: "블루 해파리", exp: 5000 },
-        { name: "옐로우탱 쉐프", exp: 8000 }, { name: "왕꽃아귀", exp: 10000 }, { name: "구름 청새치", exp: 20000 },
-        { name: "리본 복어", exp: 10000 }, { name: "파인애플 가자미", exp: 15000 }, { name: "워터메론돔", exp: 20000 },
-        { name: "하트 두동가리돔", exp: 40000 }, { name: "꿀벌 갈치", exp: 50000 }, { name: "엔젤 다랑어", exp: 100000 },
-        { name: "무지개빛 베타", exp: 100000 }, { name: "점박이 트리커 피쉬", exp: 10000 }, { name: "박치기왕 플라워 혼", exp: 20000 },
-        { name: "무리쉬 아이돌 스타", exp: 50000 }, { name: "애교쟁이 키싱구라미", exp: 40000 }, { name: "요리사 블루탱", exp: 15000 },
-        { name: "황금 구름 청새치", exp: 50000 }, { name: "황금 왕꽃아귀", exp: 30000 }, { name: "황금 옐로우탱 쉐프", exp: 20000 },
-        { name: "황금 블루 해파리", exp: 15000 }, { name: "황금 핑크 해마", exp: 6500 }, { name: "황금 하트 연어", exp: 3000 }
+        { name: "하트 연어", exp: 1500, imageFile: "salmon.png" }, 
+        { name: "핑크 해마", exp: 3000, imageFile: "sea_horse.png" }, 
+        { name: "블루 해파리", exp: 5000, imageFile: "jellyfish.png" },
+        { name: "옐로우탱 쉐프", exp: 8000, imageFile: "yellow_chef.png" }, 
+        { name: "왕꽃아귀", exp: 10000, imageFile: "flower_fish.png" }, 
+        { name: "구름 청새치", exp: 20000, imageFile: "cloud_marlin.png" },
+        { name: "리본 복어", exp: 10000, imageFile: "ribbon_puffer.png" }, 
+        { name: "파인애플 가자미", exp: 15000, imageFile: "pineapple_flatfish.png" }, 
+        { name: "워터메론돔", exp: 20000, imageFile: "watermelon_seabream.png" },
+        { name: "하트 두동가리돔", exp: 40000, imageFile: "heart_seabream.png" }, 
+        { name: "꿀벌 갈치", exp: 50000, imageFile: "bee_hairtail.png" }, 
+        { name: "엔젤 다랑어", exp: 100000, imageFile: "angel_tuna.png" },
+        { name: "무지개빛 베타", exp: 100000, imageFile: "rainbow_betta.png" }, 
+        { name: "점박이 트리커 피쉬", exp: 10000, imageFile: "spot_triggerfish.png" }, 
+        { name: "박치기왕 플라워 혼", exp: 20000, imageFile: "headbutt_horn.png" },
+        { name: "무리쉬 아이돌 스타", exp: 50000, imageFile: "moorish_idol.png" }, 
+        { name: "애교쟁이 키싱구라미", exp: 40000, imageFile: "kissing_gurami.png" }, 
+        { name: "요리사 블루탱", exp: 15000, imageFile: "chef_bluetang.png" },
+        { name: "황금 구름 청새치", exp: 50000, imageFile: "golden_cloud_marlin.png" }, 
+        { name: "황금 왕꽃아귀", exp: 30000, imageFile: "golden_flower_fish.png" }, 
+        { name: "황금 옐로우탱 쉐프", exp: 20000, imageFile: "golden_yellow_chef.png" },
+        { name: "황금 블루 해파리", exp: 15000, imageFile: "golden_jellyfish.png" }, 
+        { name: "황금 핑크 해마", exp: 6500, imageFile: "golden_sea_horse.png" }, 
+        { name: "황금 하트 연어", exp: 3000, imageFile: "golden_salmon.png" }
     ];
 
     window.onload = () => {
@@ -186,12 +218,15 @@
         }
     }
 
+    // 이미지를 렌더링하도록 코드를 수정했습니다.
     function renderFishGrid() {
         const grid = document.getElementById('fishGrid');
         grid.innerHTML = "";
         fishData.forEach((fish, i) => {
+            // 이미지 영역 (<img src="...">) 추가
             grid.innerHTML += `
                 <div class="fish-item">
+                    <img src="${fish.imageFile}" alt="${fish.name}" class="fish-image" onerror="this.src=''; this.onerror=null; this.alt='';">
                     <span class="fish-name">${fish.name}</span>
                     <span class="fish-exp">${fish.exp.toLocaleString()}</span>
                     <input type="number" 
