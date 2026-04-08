@@ -2,13 +2,14 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>테일즈런너 낚시 - 홈</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>테일즈런너 낚시 다이어리</title>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #fdfaf6;
             --primary-color: #5587d9;
+            --secondary-color: #f0f5ff;
             --text-color: #333;
             --border-color: #d1cdb7;
         }
@@ -17,137 +18,115 @@
             font-family: 'Gowun Dodum', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
         }
 
-        /* 스플래시 화면 */
         #splash {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--primary-color);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.8s ease-out;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--primary-color); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 0.5s;
         }
 
-        /* 네비게이션 탭 */
         .nav-bar {
-            display: flex;
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            display: flex; background: white; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
         }
         .nav-btn {
-            flex: 1;
-            padding: 15px 0;
-            text-align: center;
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: bold;
-            border-bottom: 3px solid transparent;
-            transition: 0.3s;
+            flex: 1; padding: 12px 0; text-align: center; text-decoration: none;
+            color: #888; font-size: 0.9em; font-weight: bold; border-bottom: 3px solid transparent;
         }
-        .nav-btn.active {
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
+        .nav-btn.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
+
+        .container { padding: 15px; max-width: 1000px; margin: 0 auto; }
+
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        #recordDate { border: 1px solid var(--border-color); border-radius: 5px; padding: 5px; font-family: inherit; }
+
+        .fish-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
         }
 
-        /* 메인 컨테이너 */
-        .container {
-            max-width: 1000px; /* 가로 6개를 위해 폭을 조금 넓힘 */
-            margin: 30px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        @media (min-width: 768px) {
+            .fish-grid { grid-template-columns: repeat(6, 1fr); }
         }
 
-        h2 { color: var(--primary-color); border-bottom: 2px dashed var(--border-color); padding-bottom: 10px; }
-        
-        /* 물고기 그리드 설정: 가로 6개 */
-        .fish-grid { 
-            display: grid; 
-            grid-template-columns: repeat(6, 1fr); 
-            gap: 10px; 
-            margin-bottom: 20px;
+        .fish-item {
+            background: white; border: 1px solid #eee; border-radius: 12px;
+            padding: 12px 5px; text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
+        .fish-name { font-size: 0.85em; font-weight: bold; margin-bottom: 8px; color: #444; height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+        .fish-exp { font-size: 0.7em; color: #aaa; margin-bottom: 8px; display: block; }
 
-        .fish-item { 
-            border: 1px solid #eee; 
-            padding: 10px 5px; 
-            border-radius: 8px; 
-            background-color: #fafafa; 
-            text-align: center;
-        }
-        .fish-item div:first-child {
-            font-size: 0.9em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .fish-item input { 
+        /* 입력창 디자인 최적화 */
+        .fish-input { 
             width: 80%; 
+            border: 1.5px solid #eee; 
+            border-radius: 6px;
             text-align: center; 
-            padding: 5px; 
-            margin-top: 5px;
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            font-family: inherit; 
-        }
-
-        .total-box { background: #f0f5ff; padding: 15px; text-align: center; font-size: 1.2em; font-weight: bold; border-radius: 8px; margin: 20px 0; }
-        
-        button.action-btn {
-            background-color: var(--primary-color); color: white;
-            border: none; padding: 12px 20px; border-radius: 8px;
-            font-size: 16px; cursor: pointer; width: 100%;
+            font-size: 1em; 
+            font-weight: bold; 
+            padding: 6px 0;
+            background: #f9f9f9;
             font-family: inherit;
+            outline-color: var(--primary-color);
         }
 
-        /* 모바일 대응 (화면이 작아지면 가로 3개나 2개로 조절) */
-        @media (max-width: 768px) {
-            .fish-grid { grid-template-columns: repeat(3, 1fr); }
+        /* 숫자 입력창 화살표 제거 */
+        .fish-input::-webkit-outer-spin-button,
+        .fish-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
+        .fish-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .total-box {
+            background: var(--secondary-color); padding: 15px; text-align: center;
+            border-radius: 12px; margin: 20px 0; font-weight: bold;
+        }
+        #todayExp { color: #e74c3c; font-size: 1.2em; }
+
+        .action-btn {
+            background: var(--primary-color); color: white; border: none;
+            width: 100%; padding: 15px; border-radius: 10px; font-size: 1em;
+            font-family: inherit; font-weight: bold; cursor: pointer;
+        }
+        .action-btn:active { background-color: #3b6bba; }
     </style>
 </head>
 <body>
 
 <div id="splash">
-    <h1>🌊 테런 낚시 다이어리</h1>
-    <p>데이터를 불러오는 중입니다...</p>
+    <h2 style="margin:0;">🌊 테일즈런너 낚시 다이어리</h2>
+    <p style="font-size:0.8em; opacity:0.8;">강태공</p>
 </div>
 
 <div class="nav-bar">
     <a href="index.html" class="nav-btn active">🏠 낚시 기록</a>
-    <a href="history.html" class="nav-btn">📊 경험치 증감표</a>
-    <a href="level.html" class="nav-btn">⭐️ 레벨업 계산기</a>
+    <a href="history.html" class="nav-btn">📊 기록장</a>
+    <a href="level.html" class="nav-btn">⭐️ 계산기</a>
 </div>
 
 <div class="container">
-    <h2>🐟 오늘의 낚시 기록</h2>
-    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-        <input type="date" id="recordDate" style="padding: 8px; font-family: inherit; border: 1px solid var(--border-color); border-radius: 5px;">
-        <button onclick="clearInputs()" style="padding: 8px; border: none; background: #95a5a6; color: white; border-radius: 5px; cursor: pointer; font-family: inherit;">수량 초기화</button>
+    <div class="header-row">
+        <input type="date" id="recordDate" onchange="loadDataByDate()">
+        <button onclick="clearInputs()" style="background:none; border:none; color:#999; font-size:0.8em; text-decoration:underline; cursor:pointer;">전체 초기화</button>
     </div>
     
     <div class="fish-grid" id="fishGrid"></div>
 
     <div class="total-box">
-        총 획득한 경험치: <span id="todayExp" style="color: #e74c3c;">0</span> EXP
+        누적 경험치: <span id="todayExp">0</span> EXP
     </div>
-    <button class="action-btn" onclick="saveRecord()">다이어리에 기록 저장하기</button>
+    <button class="action-btn" onclick="saveRecord()">오늘의 기록 저장하기</button>
 </div>
 
 <script>
-    const fNum = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
     const fishData = [
         { name: "하트 연어", exp: 1500 }, { name: "핑크 해마", exp: 3000 }, { name: "블루 해파리", exp: 5000 },
         { name: "옐로우탱 쉐프", exp: 8000 }, { name: "왕꽃아귀", exp: 10000 }, { name: "구름 청새치", exp: 20000 },
@@ -161,18 +140,11 @@
 
     window.onload = () => {
         const splash = document.getElementById('splash');
-        if (!sessionStorage.getItem('splashShown')) {
-            setTimeout(() => {
-                splash.style.opacity = '0';
-                setTimeout(() => { splash.style.display = 'none'; sessionStorage.setItem('splashShown', 'true'); }, 800);
-            }, 1000);
-        } else {
-            splash.style.display = 'none';
-        }
+        setTimeout(() => { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }, 800);
         
         document.getElementById('recordDate').valueAsDate = new Date();
         renderFishGrid();
-        loadLastData();
+        loadDataByDate();
     };
 
     function renderFishGrid() {
@@ -181,58 +153,72 @@
         fishData.forEach((fish, i) => {
             grid.innerHTML += `
                 <div class="fish-item">
-                    <div style="font-weight:bold;">${fish.name}</div>
-                    <div style="font-size:0.7em; color:#888;">${fNum(fish.exp)}</div>
-                    <div><input type="number" min="0" id="fish_${i}" oninput="tempSave()"></div>
+                    <span class="fish-name">${fish.name}</span>
+                    <span class="fish-exp">${fish.exp.toLocaleString()}</span>
+                    <input type="number" 
+                           inputmode="numeric" 
+                           class="fish-input" 
+                           id="fish_${i}" 
+                           placeholder="0"
+                           oninput="calcTotal()">
                 </div>`;
         });
     }
 
-    function tempSave() {
-        const currentCounts = {};
-        fishData.forEach((_, i) => {
-            const val = document.getElementById(`fish_${i}`).value;
-            currentCounts[i] = val;
-        });
-        localStorage.setItem('lastFishCounts', JSON.stringify(currentCounts));
-        calcTodayExp();
-    }
-
-    function loadLastData() {
-        const lastData = JSON.parse(localStorage.getItem('lastFishCounts'));
-        if (lastData) {
-            fishData.forEach((_, i) => {
-                if (lastData[i] !== undefined) {
-                    document.getElementById(`fish_${i}`).value = lastData[i];
-                }
-            });
+    function loadDataByDate() {
+        const selectedDate = document.getElementById('recordDate').value;
+        const allHistory = JSON.parse(localStorage.getItem('fishCountHistory')) || {};
+        
+        if (allHistory[selectedDate]) {
+            applyCounts(allHistory[selectedDate]);
+        } else {
+            const dates = Object.keys(allHistory).sort().reverse();
+            const prevDate = dates.find(d => d < selectedDate);
+            if (prevDate) applyCounts(allHistory[prevDate]);
+            else applyCounts({});
         }
-        calcTodayExp();
+        calcTotal();
     }
 
-    function calcTodayExp() {
+    function applyCounts(countsObj) {
+        fishData.forEach((_, i) => {
+            const val = countsObj[i];
+            document.getElementById(`fish_${i}`).value = (val === 0 || val === "0") ? 0 : (val || "");
+        });
+    }
+
+    function calcTotal() {
         let total = 0;
         fishData.forEach((fish, i) => {
             const count = parseInt(document.getElementById(`fish_${i}`).value) || 0;
             total += fish.exp * count;
         });
-        document.getElementById('todayExp').innerText = fNum(total);
+        document.getElementById('todayExp').innerText = total.toLocaleString();
         return total;
     }
 
     function clearInputs() {
-        if(!confirm("모든 수량을 초기화할까요?")) return;
-        fishData.forEach((_, i) => document.getElementById(`fish_${i}`).value = '');
-        localStorage.removeItem('lastFishCounts');
-        calcTodayExp();
+        if(!confirm("모든 수량을 0으로 초기화할까요?")) return;
+        fishData.forEach((_, i) => document.getElementById(`fish_${i}`).value = 0);
+        calcTotal();
     }
 
     function saveRecord() {
         const date = document.getElementById('recordDate').value;
-        const total = calcTodayExp();
-        let history = JSON.parse(localStorage.getItem('fishDiary')) || {};
-        history[date] = total;
-        localStorage.setItem('fishDiary', JSON.stringify(history));
+        const total = calcTotal();
+        
+        let diary = JSON.parse(localStorage.getItem('fishDiary')) || {};
+        diary[date] = total;
+        localStorage.setItem('fishDiary', JSON.stringify(diary));
+
+        let allHistory = JSON.parse(localStorage.getItem('fishCountHistory')) || {};
+        let currentCounts = {};
+        fishData.forEach((_, i) => {
+            currentCounts[i] = parseInt(document.getElementById(`fish_${i}`).value) || 0;
+        });
+        allHistory[date] = currentCounts;
+        localStorage.setItem('fishCountHistory', JSON.stringify(allHistory));
+        
         alert(`${date} 기록이 저장되었습니다!`);
     }
 </script>
