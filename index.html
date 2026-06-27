@@ -74,6 +74,7 @@
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         #recordDate { border: 1px solid var(--border-color); border-radius: 5px; padding: 5px; font-family: inherit; }
 
+        /* 물고기 그리드 */
         .fish-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -121,6 +122,95 @@
         .fish-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .fish-input[type=number] { -moz-appearance: textfield; }
 
+        /* 섹션 구분 */
+        .section-divider {
+            margin: 30px 0 20px;
+        }
+        .section-divider h2 {
+            margin-top: 0;
+        }
+
+        /* 상자&티켓 / 젤리 그리드 (2열 구성) */
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .item-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (min-width: 900px) {
+            .item-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .item-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .item-image {
+            width: 50px; height: 50px;
+            object-fit: contain;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .item-name {
+            font-size: 0.82em;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #444;
+            height: 2.4em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+            width: 100%;
+        }
+
+        .item-value {
+            font-size: 0.7em;
+            color: #aaa;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .item-input {
+            width: 80%;
+            border: 1.5px solid #eee;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1em;
+            font-weight: bold;
+            padding: 6px 0;
+            background: #f9f9f9;
+            font-family: inherit;
+            outline-color: var(--primary-color);
+        }
+        .item-input::-webkit-outer-spin-button,
+        .item-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .item-input[type=number] { -moz-appearance: textfield; }
+
+        /* 서브 섹션 타이틀 */
+        .sub-section-title {
+            font-size: 0.95em;
+            font-weight: bold;
+            color: #666;
+            margin: 16px 0 10px;
+            padding-left: 4px;
+            border-left: 3px solid var(--primary-color);
+        }
+
         .total-box {
             background: #f0f5ff; padding: 15px; text-align: center;
             border-radius: 12px; margin: 20px 0; font-weight: bold;
@@ -158,6 +248,21 @@
     
     <div class="fish-grid" id="fishGrid"></div>
 
+    <!-- 상자 & 티켓 섹션 -->
+    <div class="section-divider">
+        <h2>📦 상자 &amp; 티켓 기록</h2>
+        <div class="sub-section-title">🎁 상자</div>
+        <div class="item-grid" id="boxGrid"></div>
+        <div class="sub-section-title">🎫 티켓</div>
+        <div class="item-grid" id="ticketGrid"></div>
+    </div>
+
+    <!-- 젤리 섹션 -->
+    <div class="section-divider">
+        <h2>🍬 젤리 기록</h2>
+        <div class="item-grid" id="jellyGrid"></div>
+    </div>
+
     <div class="total-box">
         누적 경험치: <span id="todayExp">0</span> EXP
     </div>
@@ -165,63 +270,82 @@
 </div>
 
 <script>
-    // 업로드해주신 파일명으로 100% 매칭 완료
     const fishData = [
         { name: "하트 연어", exp: 1500, imageFile: "salmon.png" }, 
-
         { name: "핑크 해마", exp: 3000, imageFile: "sea_horse.png" }, 
-
         { name: "블루 해파리", exp: 5000, imageFile: "jellyfish.png" },
-
         { name: "옐로우탱 쉐프", exp: 8000, imageFile: "yellow_chef.png" }, 
-
         { name: "왕꽃아귀", exp: 10000, imageFile: "flower_fish.png" }, 
-
         { name: "구름 청새치", exp: 20000, imageFile: "cloud_marlin.png" },
-
         { name: "리본 복어", exp: 10000, imageFile: "ribbon_puffer.png" }, 
-
         { name: "파인애플 가자미", exp: 15000, imageFile: "pineapple_flatfish.png" }, 
-
         { name: "워터메론돔", exp: 20000, imageFile: "watermelon_seabream.png" },
-
         { name: "하트 두동가리돔", exp: 40000, imageFile: "heart_seabream.png" }, 
-
         { name: "꿀벌 갈치", exp: 50000, imageFile: "bee_hairtail.png" }, 
-
         { name: "엔젤 다랑어", exp: 100000, imageFile: "angel_tuna.png" },
-
         { name: "무지개빛 베타", exp: 100000, imageFile: "rainbow_betta.png" }, 
-
         { name: "점박이 트리커 피쉬", exp: 10000, imageFile: "spot_triggerfish.png" }, 
-
         { name: "박치기왕 플라워 혼", exp: 20000, imageFile: "headbutt_horn.png" },
-
         { name: "무리쉬 아이돌 스타", exp: 50000, imageFile: "moorish_idol.png" }, 
-
         { name: "애교쟁이 키싱구라미", exp: 40000, imageFile: "kissing_gurami.png" }, 
-
         { name: "요리사 블루탱", exp: 15000, imageFile: "chef_bluetang.png" },
-
         { name: "황금 구름 청새치", exp: 50000, imageFile: "golden_cloud_marlin.png" }, 
-
         { name: "황금 왕꽃아귀", exp: 30000, imageFile: "golden_flower_fish.png" }, 
-
         { name: "황금 옐로우탱 쉐프", exp: 20000, imageFile: "golden_yellow_chef.png" },
-
         { name: "황금 블루 해파리", exp: 15000, imageFile: "golden_jellyfish.png" }, 
-
         { name: "황금 핑크 해마", exp: 6500, imageFile: "golden_sea_horse.png" }, 
-
         { name: "황금 하트 연어", exp: 3000, imageFile: "golden_salmon.png" }
+    ];
+
+    // 상자 데이터
+    const boxData = [
+        { name: "2nd 브론즈 체스트", exp: 50000, imageFile: "box_2nd_bronze.png" },
+        { name: "2nd 실버 체스트", exp: 100000, imageFile: "box_2nd_silver.png" },
+        { name: "2nd 골드 체스트", exp: 200000, imageFile: "box_2nd_gold.png" },
+        { name: "2nd 다이아 체스트", exp: 500000, imageFile: "box_2nd_dia.png" },
+        { name: "브론즈 체스트", exp: 10000, imageFile: "box_bronze.png" },
+        { name: "실버 체스트", exp: 20000, imageFile: "box_silver.png" },
+        { name: "골드 체스트", exp: 30000, imageFile: "box_gold.png" },
+        { name: "다이아 체스트", exp: 50000, imageFile: "box_dia.png" },
+        { name: "앙리", exp: 100000, imageFile: "box_anri.png" },
+        { name: "이든", exp: 30000, imageFile: "box_eden.png" },
+        { name: "히든 블루밍", exp: 50000, imageFile: "box_hidden_blooming.png" },
+        { name: "히든 드래곤", exp: 50000, imageFile: "box_hidden_dragon.png" },
+        { name: "히든 엠퍼", exp: 30000, imageFile: "box_hidden_emper.png" },
+        { name: "혼돈 유물", exp: 50000, imageFile: "box_chaos_relic.png" },
+        { name: "히든 플라워", exp: 50000, imageFile: "box_hidden_flower.png" },
+        { name: "히든 컴벳", exp: 50000, imageFile: "box_hidden_combat.png" },
+        { name: "히든 코멧", exp: 50000, imageFile: "box_hidden_comet.png" }
+    ];
+
+    // 티켓 데이터
+    const ticketData = [
+        { name: "브론즈 티켓", exp: 50000, imageFile: "ticket_bronze.png" },
+        { name: "실버 티켓", exp: 100000, imageFile: "ticket_silver.png" },
+        { name: "골드 티켓", exp: 200000, imageFile: "ticket_gold.png" },
+        { name: "다이아 티켓", exp: 500000, imageFile: "ticket_dia.png" }
+    ];
+
+    // 젤리 데이터 (8개 임시)
+    const jellyData = [
+        { name: "젤리 1", exp: 10000, imageFile: "jelly_1.png" },
+        { name: "젤리 2", exp: 10000, imageFile: "jelly_2.png" },
+        { name: "젤리 3", exp: 10000, imageFile: "jelly_3.png" },
+        { name: "젤리 4", exp: 10000, imageFile: "jelly_4.png" },
+        { name: "젤리 5", exp: 10000, imageFile: "jelly_5.png" },
+        { name: "젤리 6", exp: 10000, imageFile: "jelly_6.png" },
+        { name: "젤리 7", exp: 10000, imageFile: "jelly_7.png" },
+        { name: "젤리 8", exp: 10000, imageFile: "jelly_8.png" }
     ];
 
     window.onload = () => {
         handleSplash();
-        // 오늘 날짜로 자동 세팅
         document.getElementById('recordDate').valueAsDate = new Date();
         renderFishGrid();
-        loadDataByDate(); // 로드 시 오늘 기록이 없으면 이전 기록 자동 호출
+        renderItemGrid('boxGrid', boxData, 'box');
+        renderItemGrid('ticketGrid', ticketData, 'ticket');
+        renderItemGrid('jellyGrid', jellyData, 'jelly');
+        loadDataByDate();
     };
 
     function handleSplash() {
@@ -248,12 +372,21 @@
                     <img src="${fish.imageFile}" alt="${fish.name}" class="fish-image" onerror="this.style.display='none';">
                     <span class="fish-name">${fish.name}</span>
                     <span class="fish-exp">${fish.exp.toLocaleString()}</span>
-                    <input type="number" 
-                           inputmode="numeric" 
-                           class="fish-input" 
-                           id="fish_${i}" 
-                           placeholder="0"
-                           oninput="calcTotal()">
+                    <input type="number" inputmode="numeric" class="fish-input" id="fish_${i}" placeholder="0" oninput="calcTotal()">
+                </div>`;
+        });
+    }
+
+    function renderItemGrid(gridId, dataArr, prefix) {
+        const grid = document.getElementById(gridId);
+        grid.innerHTML = "";
+        dataArr.forEach((item, i) => {
+            grid.innerHTML += `
+                <div class="item-card">
+                    <img src="${item.imageFile}" alt="${item.name}" class="item-image" onerror="this.style.display='none';">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-value">${item.exp.toLocaleString()} EXP</span>
+                    <input type="number" inputmode="numeric" class="item-input" id="${prefix}_${i}" placeholder="0" oninput="calcTotal()">
                 </div>`;
         });
     }
@@ -263,14 +396,13 @@
         const allHistory = JSON.parse(localStorage.getItem('fishCountHistory')) || {};
         
         if (allHistory[selectedDate]) {
-            applyCounts(allHistory[selectedDate]);
+            applyAllCounts(allHistory[selectedDate]);
         } else {
-            // 선택한 날짜에 기록이 없으면 이전의 가장 최근 기록 자동 로드
             const previousDate = findMostRecentPastDate(selectedDate, allHistory);
             if (previousDate) {
-                applyCounts(allHistory[previousDate]);
+                applyAllCounts(allHistory[previousDate]);
             } else {
-                applyCounts({});
+                applyAllCounts({});
             }
         }
         calcTotal();
@@ -281,10 +413,22 @@
         return dates.find(date => date < selectedDate);
     }
 
-    function applyCounts(countsObj) {
+    function applyAllCounts(countsObj) {
         fishData.forEach((_, i) => {
-            const val = countsObj[i];
-            document.getElementById(`fish_${i}`).value = (val === undefined) ? 0 : val;
+            const val = countsObj[`fish_${i}`] !== undefined ? countsObj[`fish_${i}`] : (countsObj[i] !== undefined ? countsObj[i] : 0);
+            document.getElementById(`fish_${i}`).value = val;
+        });
+        boxData.forEach((_, i) => {
+            const el = document.getElementById(`box_${i}`);
+            if (el) el.value = countsObj[`box_${i}`] || 0;
+        });
+        ticketData.forEach((_, i) => {
+            const el = document.getElementById(`ticket_${i}`);
+            if (el) el.value = countsObj[`ticket_${i}`] || 0;
+        });
+        jellyData.forEach((_, i) => {
+            const el = document.getElementById(`jelly_${i}`);
+            if (el) el.value = countsObj[`jelly_${i}`] || 0;
         });
     }
 
@@ -294,19 +438,34 @@
             const count = parseInt(document.getElementById(`fish_${i}`).value) || 0;
             total += fish.exp * count;
         });
+        boxData.forEach((item, i) => {
+            const count = parseInt(document.getElementById(`box_${i}`).value) || 0;
+            total += item.exp * count;
+        });
+        ticketData.forEach((item, i) => {
+            const count = parseInt(document.getElementById(`ticket_${i}`).value) || 0;
+            total += item.exp * count;
+        });
+        jellyData.forEach((item, i) => {
+            const count = parseInt(document.getElementById(`jelly_${i}`).value) || 0;
+            total += item.exp * count;
+        });
         document.getElementById('todayExp').innerText = total.toLocaleString();
         return total;
     }
 
     function clearInputs() {
-        if(!confirm("모든 수량을 0으로 초기화할까요?")) return;
+        if (!confirm("모든 수량을 0으로 초기화할까요?")) return;
         fishData.forEach((_, i) => document.getElementById(`fish_${i}`).value = 0);
+        boxData.forEach((_, i) => document.getElementById(`box_${i}`).value = 0);
+        ticketData.forEach((_, i) => document.getElementById(`ticket_${i}`).value = 0);
+        jellyData.forEach((_, i) => document.getElementById(`jelly_${i}`).value = 0);
         calcTotal();
     }
 
     function saveRecord() {
         const date = document.getElementById('recordDate').value;
-        if(!date) return;
+        if (!date) return;
 
         const total = calcTotal();
         let diary = JSON.parse(localStorage.getItem('fishDiary')) || {};
@@ -316,7 +475,16 @@
         let allHistory = JSON.parse(localStorage.getItem('fishCountHistory')) || {};
         let currentCounts = {};
         fishData.forEach((_, i) => {
-            currentCounts[i] = parseInt(document.getElementById(`fish_${i}`).value) || 0;
+            currentCounts[`fish_${i}`] = parseInt(document.getElementById(`fish_${i}`).value) || 0;
+        });
+        boxData.forEach((_, i) => {
+            currentCounts[`box_${i}`] = parseInt(document.getElementById(`box_${i}`).value) || 0;
+        });
+        ticketData.forEach((_, i) => {
+            currentCounts[`ticket_${i}`] = parseInt(document.getElementById(`ticket_${i}`).value) || 0;
+        });
+        jellyData.forEach((_, i) => {
+            currentCounts[`jelly_${i}`] = parseInt(document.getElementById(`jelly_${i}`).value) || 0;
         });
         allHistory[date] = currentCounts;
         localStorage.setItem('fishCountHistory', JSON.stringify(allHistory));
